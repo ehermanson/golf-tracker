@@ -1,4 +1,3 @@
-import { ResponsivePie } from '@nivo/pie';
 import invariant from 'tiny-invariant';
 
 import { type Prisma } from '@prisma/client';
@@ -16,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Heading } from '~/components/ui/heading';
 
 import { getRoundWithStats } from '~/api/round.server';
+import { ResponsivePie } from '~/components/nivo.client';
 import {
 	calculateScoreDifferential,
 	cn,
