@@ -10,3 +10,5 @@ node_modules
 /prisma/data.db-journal
 
 .DS_Store
+.settings/
+.vscode/
