@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+  seed     = "prisma/seed.ts"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  displayName String?
+  password    Password?
+  rounds      Round[]
+
+  handicap Handicap[]
+}
+
+model Password {
+  hash   String
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Handicap {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  index     Float
+  User      User     @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model Course {
+  id      String  @id @default(uuid())
+  name    String
+  address String
+  city    String
+  state   String
+  country String
+  par     Int     @default(72)
+  rounds  Round[]
+  tees    Tee[]
+  holes   Hole[]
+
+  @@unique([name, address])
+}
+
+model Hole {
+  id          String       @id @default(uuid())
+  number      Int
+  par         Int
+  strokeIndex Int
+  course      Course?      @relation(fields: [courseId], references: [id])
+  courseId    String?
+  teeForHole  TeeForHole[]
+
+  @@unique([number, courseId])
+}
+
+model Tee {
+  id       String   @id @default(uuid())
+  name     String
+  rating   Decimal?
+  slope    Int?
+  yardage  Int?
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  round    Round[]
+
+  teeForHole TeeForHole[]
+
+  @@unique(name: "courseIdTeeName", [courseId, name])
+}
+
+model TeeForHole {
+  id      String @id @default(uuid())
+  tee     Tee    @relation(fields: [teeId], references: [id], onDelete: Cascade)
+  teeId   String
+  hole    Hole   @relation(fields: [holeId], references: [id])
+  holeId  String
+  yardage Int
+}
+
+model Round {
+  id            String   @id @default(uuid())
+  datePlayed    DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  numberOfHoles Int      @default(18)
+
+  // aggregate general stats
+  totalScore    Int?
+  totalGir      Int?
+  totalFairways Int?
+  totalPutts    Int?
+
+  notes          String?
+  handicapAtTime Decimal?
+  userId         String
+  courseId       String
+  teeId          String
+
+  tees      Tee         @relation(fields: [teeId], references: [id], onDelete: Cascade)
+  course    Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  holeStats HoleStats[]
+}
+
+model HoleStats {
+  id         String  @id @default(uuid())
+  holeNumber Int
+  score      Int?
+  putts      Int?
+  drive      String? // 'hit' | 'left' | 'right' | 'long' | 'short'
+  approach   String? // 'hit' | 'left' | 'right' | 'long' | 'short'
+  chipShots  Int?
+  sandShots  Int?
+  note       String?
+  roundId    String
+  round      Round   @relation(fields: [roundId], references: [id], onDelete: Cascade)
+
+  @@unique([roundId, holeNumber])
+}
