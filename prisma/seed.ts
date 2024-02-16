@@ -14,11 +14,6 @@ async function seed() {
 
 	const email = 'test@fake.com';
 
-	// // cleanup the existing database
-	// await prisma.user.delete({ where: { email } }).catch(() => {
-	// 	// no worries if it doesn't exist yet
-	// });
-
 	const hashedPassword = await bcrypt.hash('password', 10);
 
 	const seedUser = await prisma.user.create({
