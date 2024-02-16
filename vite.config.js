@@ -24,7 +24,7 @@ export default defineConfig({
 		tsconfigPaths(),
 		cjsInterop({
 			// List of CJS dependencies that require interop
-			dependencies: ['@nivo/**'],
+			dependencies: ['@nivo/core', '@nivo/pie'],
 		}),
 		visualizer({ emitFile: true }),
 	],
