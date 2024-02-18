@@ -1,4 +1,9 @@
-import { SettingsIcon, TrendingDown, TrendingUp } from 'lucide-react';
+import {
+	SettingsIcon,
+	TrendingDown,
+	Equal as TrendingNeutral,
+	TrendingUp,
+} from 'lucide-react';
 import { type ReactNode } from 'react';
 
 import { useLoaderData } from '@remix-run/react';
@@ -18,7 +23,7 @@ import { calculateScoreDifferential, cn, formatDate } from '~/utils';
 import { type Loader } from './route';
 
 export function Dashboard() {
-	const { rounds } = useLoaderData<Loader>();
+	const { rounds, roundsPlayedTrend } = useLoaderData<Loader>();
 
 	return (
 		<main>
@@ -49,9 +54,9 @@ export function Dashboard() {
 				/>
 				<QuickStat
 					title="Rounds Played"
-					stat="6"
-					trend="2 fewer than this time last month"
-					trendDirection="negative"
+					stat={`${rounds.length}`}
+					trend={getRoundsPlayedTrendText(roundsPlayedTrend)}
+					trendDirection={getTrendDirection(roundsPlayedTrend)}
 					icon={<TrendingDown />}
 				/>
 				<QuickStat
@@ -102,21 +107,25 @@ export function Dashboard() {
 	);
 }
 
+function getTrendDirection(value: number): QuickStatProps['trendDirection'] {
+	if (value > 0) {
+		return 'positive';
+	}
+	if (value < 0) {
+		return 'negative';
+	}
+	return 'neutral';
+}
+
 interface QuickStatProps {
 	title: string;
 	stat: string;
 	trend: string;
 	icon: ReactNode;
-	trendDirection: 'positive' | 'negative';
+	trendDirection: 'positive' | 'negative' | 'neutral';
 }
 
-const QuickStat = ({
-	title,
-	stat,
-	trend,
-	icon,
-	trendDirection,
-}: QuickStatProps) => {
+const QuickStat = ({ title, stat, trend, trendDirection }: QuickStatProps) => {
 	return (
 		<Card>
 			<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -125,9 +134,12 @@ const QuickStat = ({
 					className={cn('h-4 w-4 ', {
 						'text-green-600': trendDirection === 'positive',
 						'text-red-600': trendDirection === 'negative',
+						'text-gray-600': trendDirection === 'neutral',
 					})}
 				>
-					{icon}
+					{trendDirection === 'positive' && <TrendingUp />}
+					{trendDirection === 'negative' && <TrendingDown />}
+					{trendDirection === 'neutral' && <TrendingNeutral />}
 				</div>
 			</CardHeader>
 			<CardContent>
@@ -136,6 +148,17 @@ const QuickStat = ({
 			</CardContent>
 		</Card>
 	);
+};
+
+const getRoundsPlayedTrendText = (value: number) => {
+	if (value === 0) {
+		return 'Same as last month';
+	}
+	let symbol = '';
+	if (value > 0) {
+		symbol = '+';
+	}
+	return `${symbol}${value} since last month`;
 };
 
 interface DashboardCardProps {
