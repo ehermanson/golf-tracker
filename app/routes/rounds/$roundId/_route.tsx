@@ -259,7 +259,7 @@ export default function RoundDetailPage() {
 									from: 'color',
 									modifiers: [['darker', 0.5]],
 								}}
-								arcLabel={e =>
+								arcLabel={(e: any) =>
 									`${e.id} - ${((e.data.value / 18) * 100).toFixed(1)}%`
 								}
 								enableArcLinkLabels={false}
@@ -313,7 +313,7 @@ export default function RoundDetailPage() {
 										from: 'color',
 										modifiers: [['darker', 0.5]],
 									}}
-									arcLabel={e => `${e.id} - ${e.data.percent}%`}
+									arcLabel={(e: any) => `${e.id} - ${e.data.percent}%`}
 									enableArcLinkLabels={false}
 								/>
 							</div>
@@ -348,7 +348,7 @@ export default function RoundDetailPage() {
 										from: 'color',
 										modifiers: [['darker', 0.5]],
 									}}
-									arcLabel={e => `${e.id} - ${e.data.percent}%`}
+									arcLabel={(e: any) => `${e.id} - ${e.data.percent}%`}
 									enableArcLinkLabels={false}
 								/>
 							</div>
