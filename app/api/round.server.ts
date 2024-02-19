@@ -47,6 +47,53 @@ export function getCompletedRounds({
 	});
 }
 
+// @TODO: Use for % of change stats
+// function getPercentageDifference(a: number, b: number): number {
+//   const absDiff = Math.abs(a-b);
+//   const avg = (a + b) / 2;
+//   const percent = (absDiff / avg) * 100;
+
+//   return percent;
+// }
+
+export async function getRoundsPlayedMonthTrend({
+	userId,
+	month,
+	year,
+}: {
+	userId: Round['userId'];
+	month: number;
+	year: number;
+}): Promise<number> {
+	const previousFirstDay = new Date(year, month - 1, 1);
+	const previousLastDay = new Date(year, month, 0);
+	const previousRounds = await prisma.round.count({
+		where: {
+			userId,
+			totalScore: { not: null },
+			datePlayed: {
+				gte: previousFirstDay,
+				lte: previousLastDay,
+			},
+		},
+	});
+	const firstDay = new Date(year, month, 1);
+	const lastDay = new Date(year, month + 1, 0);
+	const rounds = await prisma.round.count({
+		where: {
+			userId,
+			totalScore: { not: null },
+			datePlayed: {
+				gte: firstDay,
+				lte: lastDay,
+			},
+		},
+	});
+
+	const diff = rounds - previousRounds;
+	return diff;
+}
+
 export async function getRoundWithStats({ id }: { id: Round['id'] }) {
 	const round = await prisma.round.findUnique({
 		where: { id },
@@ -75,7 +122,6 @@ export async function getRoundWithStats({ id }: { id: Round['id'] }) {
 				const statsForHole = round.holeStats.find(
 					stat => stat.holeNumber === hole.number,
 				);
-
 				return {
 					...hole,
 					yardage: teeForHole?.yardage ?? 0,
@@ -97,7 +143,15 @@ export async function createRound({
 }: Pick<
 	Round,
 	'datePlayed' | 'numberOfHoles' | 'courseId' | 'userId' | 'teeId'
-> & { userId: User['id'] }) {
+> & { userId: User['id'] }): Promise<Round> {
+	const course = await prisma.course.findUniqueOrThrow({
+		where: {
+			id: courseId,
+		},
+		include: {
+			holes: true,
+		},
+	});
 	return await prisma.round.create({
 		data: {
 			datePlayed,
@@ -105,6 +159,13 @@ export async function createRound({
 			courseId,
 			userId,
 			teeId,
+			totalScore: course.par,
+			holeStats: {
+				create: course.holes.map(h => ({
+					holeNumber: h.number,
+					score: h.par,
+				})),
+			},
 		},
 	});
 }
