@@ -9,9 +9,6 @@ import { installGlobals } from '@remix-run/node';
 installGlobals();
 
 export default defineConfig({
-	ssr: {
-		noExternal: ['@nivo/core', '@nivo/pie'],
-	},
 	server: {
 		port: 3000,
 	},

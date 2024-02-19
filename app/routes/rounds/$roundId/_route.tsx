@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Heading } from '~/components/ui/heading';
 
 import { getRoundWithStats } from '~/api/round.server';
-import { ResponsivePie } from '~/components/nivo.client';
+import { PieChart } from '~/components/pie-chart';
 import {
 	calculateScoreDifferential,
 	cn,
@@ -246,7 +246,7 @@ export default function RoundDetailPage() {
 					</CardHeader>
 					<CardContent>
 						<div className="h-96 mb-8 font-bold">
-							<ResponsivePie
+							<PieChart
 								data={scoreDistributionChart}
 								innerRadius={0.5}
 								padAngle={0.7}
@@ -298,7 +298,7 @@ export default function RoundDetailPage() {
 						}
 						subStat={
 							<div className="h-40">
-								<ResponsivePie
+								<PieChart
 									data={driveChartData}
 									startAngle={-90}
 									endAngle={90}
@@ -333,7 +333,7 @@ export default function RoundDetailPage() {
 						}
 						subStat={
 							<div className="h-40">
-								<ResponsivePie
+								<PieChart
 									data={approachChartData}
 									startAngle={-90}
 									endAngle={90}

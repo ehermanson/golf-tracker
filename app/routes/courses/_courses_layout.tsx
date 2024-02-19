@@ -46,7 +46,7 @@ export default function CoursesPage() {
 						<PageSideBarLinks>
 							{data.coursesList.map(course => (
 								<li key={course.id}>
-									<PageSidebarLink to={course.id}>
+									<PageSidebarLink to={course.id} prefetch="intent">
 										{course.name}
 									</PageSidebarLink>
 								</li>

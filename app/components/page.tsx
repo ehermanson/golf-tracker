@@ -32,8 +32,7 @@ export function PageSideBarLinks({ children }: { children: ReactNode }) {
 }
 
 export function PageSidebarLink({
-	to,
-	children,
+	...props
 }: React.ComponentProps<typeof NavLink>) {
 	return (
 		<NavLink
@@ -47,9 +46,9 @@ export function PageSidebarLink({
 					'cursor-default': isActive,
 				})
 			}
-			to={to}
+			{...props}
 		>
-			{children}
+			{props.children}
 		</NavLink>
 	);
 }

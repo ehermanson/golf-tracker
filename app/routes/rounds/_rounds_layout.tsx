@@ -49,7 +49,7 @@ export default function RoundsPage() {
 							{data.rounds.map(round => {
 								return (
 									<li key={round.id}>
-										<PageSidebarLink to={round.id}>
+										<PageSidebarLink to={round.id} prefetch="intent">
 											<div className="flex justify-between items-center">
 												<div>
 													<div className="font-bold text-lg">
