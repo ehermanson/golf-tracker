@@ -42,7 +42,6 @@ export function Dashboard() {
 					stat="5.2"
 					trend="-0.8 since last month"
 					trendDirection="positive"
-					icon={<TrendingDown />}
 				/>
 
 				<QuickStat
@@ -50,21 +49,18 @@ export function Dashboard() {
 					stat="68%"
 					trend="+6% since last month"
 					trendDirection="positive"
-					icon={<TrendingUp />}
 				/>
 				<QuickStat
 					title="Rounds Played"
 					stat={`${rounds.length}`}
 					trend={getRoundsPlayedTrendText(roundsPlayedTrend)}
 					trendDirection={getTrendDirection(roundsPlayedTrend)}
-					icon={<TrendingDown />}
 				/>
 				<QuickStat
 					title="% Par or Better"
 					stat="60%"
 					trend="+5% since last month"
 					trendDirection="positive"
-					icon={<TrendingUp />}
 				/>
 				<div className="col-span-2">
 					<DashboardCard
@@ -119,9 +115,8 @@ function getTrendDirection(value: number): QuickStatProps['trendDirection'] {
 
 interface QuickStatProps {
 	title: string;
-	stat: string;
+	stat: string | number;
 	trend: string;
-	icon: ReactNode;
 	trendDirection: 'positive' | 'negative' | 'neutral';
 }
 
