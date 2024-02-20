@@ -57,6 +57,7 @@
     "react-aria": "^3.31.1",
     "react-day-picker": "^8.10.0",
     "react-dom": "^18.2.0",
+    "react-merge-refs": "^2.1.1",
     "react-resizable-panels": "^1.0.9",
     "react-stately": "^3.29.1",
     "remix-themes": "^1.2.2",
