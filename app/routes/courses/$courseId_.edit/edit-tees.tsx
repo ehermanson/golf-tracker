@@ -106,9 +106,16 @@ export function EditTees() {
 							placeholder="Tee Name (e.g. black, blue)"
 							value={newTeeName}
 							onChange={e => setNewTeeName(e.target.value)}
+							required
 						/>
-						<Input name="rating" placeholder="Rating" type="number" />
-						<Input name="slope" placeholder="Slope" type="number" />
+						<Input
+							name="rating"
+							placeholder="Rating"
+							type="number"
+							step="0.01"
+							required
+						/>
+						<Input name="slope" placeholder="Slope" type="number" required />
 					</fieldset>
 				)}
 				<Table>
