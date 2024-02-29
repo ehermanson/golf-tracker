@@ -190,6 +190,84 @@ export async function getFairwaysHitTrend({
 	};
 }
 
+async function getRoundsWithGir({
+	userId,
+	gte,
+	lte,
+}: {
+	userId: string;
+	gte: Date;
+	lte: Date;
+}) {
+	return await prisma.round.findMany({
+		where: {
+			userId,
+			totalScore: { not: null },
+			datePlayed: {
+				gte,
+				lte,
+			},
+		},
+		select: {
+			numberOfHoles: true,
+			totalGir: true,
+		},
+	});
+}
+
+export async function getGirTrend({
+	userId,
+	month,
+	year,
+}: {
+	userId: Round['userId'];
+	month: number;
+	year: number;
+}) {
+	const previousFirstDay = new Date(year, month - 1, 1);
+	const previousLastDay = new Date(year, month, 0);
+	const previousRounds = await getRoundsWithGir({
+		userId,
+		gte: previousFirstDay,
+		lte: previousLastDay,
+	});
+
+	const firstDay = new Date(year, month, 1);
+	const lastDay = new Date(year, month + 1, 0);
+	const currentRounds = await getRoundsWithGir({
+		userId,
+		gte: firstDay,
+		lte: lastDay,
+	});
+
+	const getAggregates = (rounds: typeof currentRounds) => {
+		const totals = rounds.reduce(
+			(acc, round) => {
+				acc.numberOfHoles += round.numberOfHoles;
+				acc.gir += round.totalGir ?? 0;
+
+				return acc;
+			},
+			{ numberOfHoles: 0, gir: 0 },
+		);
+
+		const percent =
+			totals.numberOfHoles > 0 ? totals.gir / totals.numberOfHoles : 0;
+
+		return { ...totals, percent };
+	};
+
+	const previous = getAggregates(previousRounds);
+	const current = getAggregates(currentRounds);
+	const diff = current.percent - previous.percent;
+
+	return {
+		currentPercent: current.percent,
+		previousPercent: previous.percent,
+		diff,
+	};
+}
+
 export async function getRoundWithStats({ id }: { id: Round['id'] }) {
 	const round = await prisma.round.findUnique({
 		where: { id },
