@@ -23,7 +23,10 @@ import { calculateScoreDifferential, cn, formatDate } from '~/utils';
 import { type Loader } from './route';
 
 export function Dashboard() {
-	const { rounds, roundsPlayedTrend } = useLoaderData<Loader>();
+	const { rounds, roundsPlayedTrend, fairwaysHitTrend } =
+		useLoaderData<Loader>();
+
+	console.log({ fairwaysHitTrend });
 
 	return (
 		<main>
@@ -46,9 +49,9 @@ export function Dashboard() {
 
 				<QuickStat
 					title="Fairways Hit"
-					stat="68%"
-					trend="+6% since last month"
-					trendDirection="positive"
+					stat={`${formatPercent(fairwaysHitTrend.currentPercent)}`}
+					trend={getPercentageDiffText(fairwaysHitTrend.diff)}
+					trendDirection={getTrendDirection(fairwaysHitTrend.diff)}
 				/>
 				<QuickStat
 					title="Rounds Played"
@@ -143,6 +146,28 @@ const QuickStat = ({ title, stat, trend, trendDirection }: QuickStatProps) => {
 			</CardContent>
 		</Card>
 	);
+};
+
+const formatPercent = (percentage: number) => {
+	return new Intl.NumberFormat('en-US', {
+		style: 'percent',
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	}).format(percentage);
+};
+
+const getPercentageDiffText = (percentage: number) => {
+	if (percentage === 0) {
+		return 'Same as last month';
+	}
+	let symbol = '';
+	if (percentage > 0) {
+		symbol = '+';
+	}
+	if (percentage < 0) {
+		symbol = '-';
+	}
+	return `${symbol}${formatPercent(percentage)} since last month`;
 };
 
 const getRoundsPlayedTrendText = (value: number) => {
