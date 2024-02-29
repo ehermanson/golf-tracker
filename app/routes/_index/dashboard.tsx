@@ -26,8 +26,6 @@ export function Dashboard() {
 	const { rounds, roundsPlayedTrend, fairwaysHitTrend } =
 		useLoaderData<Loader>();
 
-	console.log({ fairwaysHitTrend });
-
 	return (
 		<main>
 			<PageHeader

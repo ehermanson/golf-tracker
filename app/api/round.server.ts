@@ -1,4 +1,4 @@
-import { type HoleStats, type Round, type User } from '@prisma/client';
+import { Prisma, type HoleStats, type Round, type User } from '@prisma/client';
 
 import { prisma } from '~/db.server';
 
@@ -94,25 +94,22 @@ export async function getRoundsPlayedMonthTrend({
 	return diff;
 }
 
-export async function getFairwaysHitTrend({
+async function getRoundsWithFairwaysHit({
 	userId,
-	month,
-	year,
+	gte,
+	lte,
 }: {
-	userId: Round['userId'];
-	month: number;
-	year: number;
+	userId: string;
+	gte: Date;
+	lte: Date;
 }) {
-	const previousFirstDay = new Date(year, month - 1, 1);
-	const previousLastDay = new Date(year, month, 0);
-
-	const previousRounds = await prisma.round.findMany({
+	return await prisma.round.findMany({
 		where: {
 			userId,
 			totalScore: { not: null },
 			datePlayed: {
-				gte: previousFirstDay,
-				lte: previousLastDay,
+				gte,
+				lte,
 			},
 		},
 		select: {
@@ -134,36 +131,31 @@ export async function getFairwaysHitTrend({
 			},
 		},
 	});
+}
+
+export async function getFairwaysHitTrend({
+	userId,
+	month,
+	year,
+}: {
+	userId: Round['userId'];
+	month: number;
+	year: number;
+}) {
+	const previousFirstDay = new Date(year, month - 1, 1);
+	const previousLastDay = new Date(year, month, 0);
+	const previousRounds = await getRoundsWithFairwaysHit({
+		userId,
+		gte: previousFirstDay,
+		lte: previousLastDay,
+	});
 
 	const firstDay = new Date(year, month, 1);
 	const lastDay = new Date(year, month + 1, 0);
-	const currentRounds = await prisma.round.findMany({
-		where: {
-			userId,
-			totalScore: { not: null },
-			datePlayed: {
-				gte: firstDay,
-				lte: lastDay,
-			},
-		},
-		select: {
-			totalFairways: true,
-			course: {
-				select: {
-					_count: {
-						select: {
-							holes: {
-								where: {
-									par: {
-										not: 3,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
+	const currentRounds = await getRoundsWithFairwaysHit({
+		userId,
+		gte: firstDay,
+		lte: lastDay,
 	});
 
 	const getAggregates = (rounds: typeof currentRounds) => {
