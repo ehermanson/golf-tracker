@@ -23,7 +23,7 @@ import { calculateScoreDifferential, cn, formatDate } from '~/utils';
 import { type Loader } from './route';
 
 export function Dashboard() {
-	const { rounds, roundsPlayedTrend, fairwaysHitTrend } =
+	const { rounds, roundsPlayedTrend, fairwaysHitTrend, girTrend } =
 		useLoaderData<Loader>();
 
 	return (
@@ -38,13 +38,18 @@ export function Dashboard() {
 				}
 			/>
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-[2vw] p-10">
-				<QuickStat
+				{/* <QuickStat
 					title="Handicap"
 					stat="5.2"
 					trend="-0.8 since last month"
 					trendDirection="positive"
+				/> */}
+				<QuickStat
+					title="Rounds Played"
+					stat={`${rounds.length}`}
+					trend={getRoundsPlayedTrendText(roundsPlayedTrend)}
+					trendDirection={getTrendDirection(roundsPlayedTrend)}
 				/>
-
 				<QuickStat
 					title="Fairways Hit"
 					stat={`${formatPercent(fairwaysHitTrend.currentPercent)}`}
@@ -52,10 +57,10 @@ export function Dashboard() {
 					trendDirection={getTrendDirection(fairwaysHitTrend.diff)}
 				/>
 				<QuickStat
-					title="Rounds Played"
-					stat={`${rounds.length}`}
-					trend={getRoundsPlayedTrendText(roundsPlayedTrend)}
-					trendDirection={getTrendDirection(roundsPlayedTrend)}
+					title="GIR"
+					stat={`${formatPercent(girTrend.currentPercent)}`}
+					trend={getPercentageDiffText(girTrend.diff)}
+					trendDirection={getTrendDirection(girTrend.diff)}
 				/>
 				<QuickStat
 					title="% Par or Better"

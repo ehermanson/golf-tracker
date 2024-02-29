@@ -4,6 +4,7 @@ import { type MetaFunction } from '@remix-run/react';
 import {
 	getCompletedRounds,
 	getFairwaysHitTrend,
+	getGirTrend,
 	getRoundsPlayedMonthTrend,
 } from '~/api/round.server';
 import { requireUserId } from '~/session.server';
@@ -11,22 +12,19 @@ import { Dashboard } from './dashboard';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const userId = await requireUserId(request);
-	const rounds = await getCompletedRounds({ userId, take: 5 });
-
 	const date = new Date();
-	const roundsPlayedTrend = await getRoundsPlayedMonthTrend({
-		userId,
-		month: date.getMonth(),
-		year: date.getFullYear(),
-	});
+	const month = date.getMonth();
+	const year = date.getFullYear();
 
-	const fairwaysHitTrend = await getFairwaysHitTrend({
-		userId,
-		month: date.getMonth(),
-		year: date.getFullYear(),
-	});
+	const [rounds, roundsPlayedTrend, fairwaysHitTrend, girTrend] =
+		await Promise.all([
+			getCompletedRounds({ userId, take: 5 }),
+			getRoundsPlayedMonthTrend({ userId, month, year }),
+			getFairwaysHitTrend({ userId, month, year }),
+			getGirTrend({ userId, month, year }),
+		]);
 
-	return json({ rounds, roundsPlayedTrend, fairwaysHitTrend });
+	return json({ rounds, roundsPlayedTrend, fairwaysHitTrend, girTrend });
 };
 
 export type Loader = typeof loader;
