@@ -94,6 +94,102 @@ export async function getRoundsPlayedMonthTrend({
 	return diff;
 }
 
+async function getRoundsWithFairwaysHit({
+	userId,
+	gte,
+	lte,
+}: {
+	userId: string;
+	gte: Date;
+	lte: Date;
+}) {
+	return await prisma.round.findMany({
+		where: {
+			userId,
+			totalScore: { not: null },
+			datePlayed: {
+				gte,
+				lte,
+			},
+		},
+		select: {
+			totalFairways: true,
+			course: {
+				select: {
+					_count: {
+						select: {
+							holes: {
+								where: {
+									par: {
+										not: 3,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	});
+}
+
+export async function getFairwaysHitTrend({
+	userId,
+	month,
+	year,
+}: {
+	userId: Round['userId'];
+	month: number;
+	year: number;
+}) {
+	const previousFirstDay = new Date(year, month - 1, 1);
+	const previousLastDay = new Date(year, month, 0);
+	const previousRounds = await getRoundsWithFairwaysHit({
+		userId,
+		gte: previousFirstDay,
+		lte: previousLastDay,
+	});
+
+	const firstDay = new Date(year, month, 1);
+	const lastDay = new Date(year, month + 1, 0);
+	const currentRounds = await getRoundsWithFairwaysHit({
+		userId,
+		gte: firstDay,
+		lte: lastDay,
+	});
+
+	const getAggregates = (rounds: typeof currentRounds) => {
+		const totals = rounds.reduce(
+			(acc, round) => {
+				const possibleFairways = round.course._count.holes;
+				const totalFairways = round.totalFairways ?? 0;
+				acc.totalFairways += totalFairways;
+				acc.possibleFairways += possibleFairways;
+
+				return acc;
+			},
+			{ totalFairways: 0, possibleFairways: 0 },
+		);
+
+		const percent =
+			totals.possibleFairways > 0
+				? totals.totalFairways / totals.possibleFairways
+				: 0;
+
+		return { ...totals, percent };
+	};
+
+	const previous = getAggregates(previousRounds);
+	const current = getAggregates(currentRounds);
+	const diff = current.percent - previous.percent;
+
+	return {
+		currentPercent: current.percent,
+		previousPercent: previous.percent,
+		diff,
+	};
+}
+
 export async function getRoundWithStats({ id }: { id: Round['id'] }) {
 	const round = await prisma.round.findUnique({
 		where: { id },
