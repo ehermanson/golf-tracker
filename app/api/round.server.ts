@@ -1,4 +1,4 @@
-import { Prisma, type HoleStats, type Round, type User } from '@prisma/client';
+import { type HoleStats, type Round, type User } from '@prisma/client';
 
 import { prisma } from '~/db.server';
 
