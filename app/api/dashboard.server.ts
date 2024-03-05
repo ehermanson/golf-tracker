@@ -24,7 +24,6 @@ export async function getScoreDistribution({
 				lte: lastDay,
 			},
 		},
-		take: 5,
 		select: {
 			id: true,
 		},
