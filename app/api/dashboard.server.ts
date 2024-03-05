@@ -50,12 +50,7 @@ export async function getScoreDistribution({
 					score: true,
 					hole: {
 						select: {
-							id: true,
-							hole: {
-								select: {
-									par: true,
-								},
-							},
+							par: true,
 						},
 					},
 				},
@@ -63,10 +58,10 @@ export async function getScoreDistribution({
 		}),
 	);
 
-	roundStats.forEach(holes => {
-		holes.forEach(hole => {
-			const score = hole.score;
-			const par = hole.hole?.hole.par;
+	roundStats.forEach(holeStats => {
+		holeStats.forEach(holeStat => {
+			const score = holeStat.score;
+			const par = holeStat.hole?.par;
 
 			if (!score || !par) {
 				return;

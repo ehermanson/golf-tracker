@@ -74,13 +74,11 @@ async function seed() {
 			const holeNumber = idx + 1;
 			const hole = seedCourse.holes.find(hole => hole.number === holeNumber);
 
-			const teeForHoleId = await prisma.teeForHole.findFirstOrThrow({
-				where: {
-					holeId: hole?.id || 'aas',
-				},
-			});
+			if (!hole) {
+				throw new Error('could not find matching hole');
+			}
 
-			return createStat(holeNumber, teeForHoleId.id);
+			return createStat(holeNumber, hole.id);
 		});
 
 		const stats = await Promise.all(statPromises);

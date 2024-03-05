@@ -229,7 +229,7 @@ export default function RoundDetailPage() {
 							<div className="text-xs">Par {hole.par}</div>
 							<div className="text-xs">{teeForHole?.yardage} yds</div>
 						</div>
-						<input type="hidden" name="holeId" value={teeForHole?.id} />
+						<input type="hidden" name="holeId" value={hole.id} />
 						<StatInput
 							name="score"
 							label="Score"

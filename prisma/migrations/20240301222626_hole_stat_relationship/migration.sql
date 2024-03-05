@@ -13,7 +13,7 @@ CREATE TABLE "new_HoleStats" (
     "roundId" TEXT NOT NULL,
     "holeId" TEXT,
     CONSTRAINT "HoleStats_roundId_fkey" FOREIGN KEY ("roundId") REFERENCES "Round" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "HoleStats_holeId_fkey" FOREIGN KEY ("holeId") REFERENCES "TeeForHole" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT "HoleStats_holeId_fkey" FOREIGN KEY ("holeId") REFERENCES "Hole" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 INSERT INTO "new_HoleStats" ("approach", "chipShots", "drive", "holeNumber", "id", "note", "putts", "roundId", "sandShots", "score") SELECT "approach", "chipShots", "drive", "holeNumber", "id", "note", "putts", "roundId", "sandShots", "score" FROM "HoleStats";
 DROP TABLE "HoleStats";

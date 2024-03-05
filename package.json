@@ -16,7 +16,7 @@
     "typecheck": "tsc && tsc -p cypress",
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run",
     "studio": "npx prisma studio",
-    "data-migration:hole_stat_relationship": "tsx ./prisma/migrations/prisma/migrations/20240301222626_hole_stat_relationship/data-migration.ts"
+    "data-migration:hole_stat_relationship": "tsx ./prisma/migrations/20240301222626_hole_stat_relationship/data-migration.ts"
   },
   "eslintIgnore": [
     "/node_modules",
