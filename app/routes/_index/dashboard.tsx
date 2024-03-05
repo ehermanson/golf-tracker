@@ -4,6 +4,7 @@ import {
 	Equal as TrendingNeutral,
 	TrendingUp,
 } from 'lucide-react';
+import { ClientOnly } from 'remix-utils/client-only';
 import { type ReactNode } from 'react';
 
 import { useLoaderData } from '@remix-run/react';
@@ -18,13 +19,44 @@ import {
 } from '~/components/ui/card';
 
 import { PageHeader } from '~/components/page';
+import { PieChart } from '~/components/pie-chart.client';
 import { Score, ScoreToPar } from '~/components/score-display';
 import { calculateScoreDifferential, cn, formatDate } from '~/utils';
 import { type Loader } from './route';
 
 export function Dashboard() {
-	const { rounds, roundsPlayedTrend, fairwaysHitTrend, girTrend } =
-		useLoaderData<Loader>();
+	const {
+		rounds,
+		roundsPlayedTrend,
+		fairwaysHitTrend,
+		girTrend,
+		scoreDistribution,
+	} = useLoaderData<Loader>();
+
+	type ChartData = {
+		id: string;
+		label: string;
+		value: number;
+	};
+
+	const { chartData, holesWithScores } = Object.entries(
+		scoreDistribution,
+	).reduce(
+		(acc, [id, value]) => {
+			// Accumulate total # of holes w/ scores
+			acc.holesWithScores += value;
+			if (value !== 0) {
+				acc.chartData.push({
+					id,
+					label: id,
+					value,
+				});
+			}
+
+			return acc;
+		},
+		{ chartData: [] as ChartData[], holesWithScores: 0 },
+	);
 
 	return (
 		<main>
@@ -79,8 +111,30 @@ export function Dashboard() {
 					</DashboardCard>
 				</div>
 				<div className="col-span-2">
-					<DashboardCard title="Score Distribution" description="Yep">
-						Chart
+					<DashboardCard
+						title="Score Distribution"
+						description={`Based on ${holesWithScores} holes`}
+					>
+						<ClientOnly>
+							{() => (
+								<div className="h-96 mb-8 font-bold">
+									<PieChart
+										data={chartData}
+										arcLabel={e =>
+											`${e.id} - ${((e.value / holesWithScores) * 100).toFixed(
+												1,
+											)}%`
+										}
+										layers={[
+											'arcs',
+											'arcLabels',
+											// @ts-ignore
+											CenteredMetric,
+										]}
+									/>
+								</div>
+							)}
+						</ClientOnly>
 					</DashboardCard>
 				</div>
 				<div className="col-span-2">
@@ -168,7 +222,7 @@ const getPercentageDiffText = (percentage: number) => {
 		symbol = '+';
 	}
 	if (percentage < 0) {
-		symbol = '-';
+		symbol = '';
 	}
 	return `${symbol}${formatPercent(percentage)} since last month`;
 };
@@ -236,5 +290,53 @@ const RoundRow = ({ round }: { round: any }) => {
 				</div>
 			</div>
 		</div>
+	);
+};
+const CenteredMetric = ({
+	dataWithArc,
+	centerX,
+	centerY,
+	...props
+}: {
+	dataWithArc: {
+		id: string;
+		value: number;
+	}[];
+	centerX: number;
+	centerY: number;
+}) => {
+	console.log({ dataWithArc, props });
+
+	const totalScores = Object.values(dataWithArc).reduce(
+		(tot, cur) => tot + cur.value,
+		0,
+	);
+
+	const parsOrBetter = dataWithArc.filter(
+		data => data.id === 'pars' || data.id === 'birdies' || data.id === 'eagles',
+	);
+
+	const total = parsOrBetter.reduce((tot, curr) => {
+		return tot + curr.value;
+	}, 0);
+
+	return (
+		<text
+			x={centerX}
+			y={centerY}
+			textAnchor="middle"
+			dominantBaseline="central"
+			style={{
+				fontSize: '20px',
+				fontWeight: 600,
+			}}
+		>
+			<tspan x={centerX} y={centerY - 20}>
+				{total} ({((total / totalScores) * 100).toFixed(1)}%)
+			</tspan>
+			<tspan x={centerX} y={centerY}>
+				pars or better
+			</tspan>
+		</text>
 	);
 };

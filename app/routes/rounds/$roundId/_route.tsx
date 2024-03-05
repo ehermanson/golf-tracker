@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Heading } from '~/components/ui/heading';
 
 import { getRoundWithStats } from '~/api/round.server';
-import { ResponsivePie } from '~/components/nivo.client';
+import { PieChart } from '~/components/pie-chart.client';
 import {
 	calculateScoreDifferential,
 	cn,
@@ -188,9 +188,8 @@ export default function RoundDetailPage() {
 	const driveChartData = Object.entries(drivingStats)
 		.map(([id, value]) => ({
 			id,
-			label: id,
+			label: `${id} - ${value.percentage}%`,
 			value: value.count,
-			percent: value.percentage,
 		}))
 		// long and short kinda dumb for drives
 		.filter(d => d.id !== 'short' && d.id !== 'long');
@@ -198,9 +197,8 @@ export default function RoundDetailPage() {
 	const approachChartData = Object.entries(approachStats).map(
 		([id, value]) => ({
 			id,
-			label: id,
+			label: `${id} - ${value.percentage}%`,
 			value: value.count,
-			percent: value.percentage,
 		}),
 	);
 
@@ -246,23 +244,11 @@ export default function RoundDetailPage() {
 					</CardHeader>
 					<CardContent>
 						<div className="h-96 mb-8 font-bold">
-							<ResponsivePie
+							<PieChart
 								data={scoreDistributionChart}
-								innerRadius={0.5}
-								padAngle={0.7}
-								cornerRadius={1}
-								activeOuterRadiusOffset={0}
-								animate={false}
-								colors={{ scheme: 'blues' }}
-								borderWidth={1}
-								borderColor={{
-									from: 'color',
-									modifiers: [['darker', 0.5]],
-								}}
 								arcLabel={e =>
-									`${e.id} - ${((e.data.value / 18) * 100).toFixed(1)}%`
+									`${e.id} - ${((e.value / 18) * 100).toFixed(1)}%`
 								}
-								enableArcLinkLabels={false}
 								layers={[
 									'arcs',
 									'arcLabels',
@@ -298,23 +284,11 @@ export default function RoundDetailPage() {
 						}
 						subStat={
 							<div className="h-40">
-								<ResponsivePie
+								<PieChart
 									data={driveChartData}
 									startAngle={-90}
 									endAngle={90}
-									innerRadius={0.45}
-									padAngle={1}
-									cornerRadius={1}
-									activeOuterRadiusOffset={0}
-									animate={false}
-									colors={{ scheme: 'blues' }}
-									borderWidth={1}
-									borderColor={{
-										from: 'color',
-										modifiers: [['darker', 0.5]],
-									}}
-									arcLabel={e => `${e.id} - ${e.data.percent}%`}
-									enableArcLinkLabels={false}
+									arcLabel={e => `${e.label}`}
 								/>
 							</div>
 						}
@@ -333,23 +307,11 @@ export default function RoundDetailPage() {
 						}
 						subStat={
 							<div className="h-40">
-								<ResponsivePie
+								<PieChart
 									data={approachChartData}
 									startAngle={-90}
 									endAngle={90}
-									innerRadius={0.45}
-									padAngle={0.7}
-									cornerRadius={1}
-									activeOuterRadiusOffset={0}
-									animate={false}
-									colors={{ scheme: 'blues' }}
-									borderWidth={1}
-									borderColor={{
-										from: 'color',
-										modifiers: [['darker', 0.5]],
-									}}
-									arcLabel={e => `${e.id} - ${e.data.percent}%`}
-									enableArcLinkLabels={false}
+									arcLabel={e => `${e.label}`}
 								/>
 							</div>
 						}
@@ -406,7 +368,6 @@ const CenteredMetric = ({
 	dataWithArc,
 	centerX,
 	centerY,
-	...props
 }: {
 	dataWithArc: {
 		id: string;

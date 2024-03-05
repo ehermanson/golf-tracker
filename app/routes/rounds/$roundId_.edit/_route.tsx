@@ -44,6 +44,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 	const intent = formData.get('_intent');
 
 	const holeNumber = Number(formData.get('holeNumber'));
+	const holeId = String(formData.get('holeId'));
 
 	switch (intent) {
 		case 'updateScore': {
@@ -52,6 +53,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			await updateStat({
 				roundId,
 				holeNumber,
+				holeId,
 				name: 'score',
 				value: score,
 			});
@@ -65,6 +67,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			await updateStat({
 				roundId,
 				holeNumber,
+				holeId,
 				name: 'drive',
 				value: result,
 			});
@@ -78,6 +81,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			await updateStat({
 				roundId,
 				holeNumber,
+				holeId,
 				name: 'approach',
 				value: result,
 			});
@@ -90,6 +94,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			await updateStat({
 				roundId,
 				holeNumber,
+				holeId,
 				name: 'putts',
 				value: putts,
 			});
@@ -102,6 +107,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			await updateStat({
 				roundId,
 				holeNumber,
+				holeId,
 				name: 'chipShots',
 				value: chipShots,
 			});
@@ -113,6 +119,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			await updateStat({
 				roundId,
 				holeNumber,
+				holeId,
 				name: 'sandShots',
 				value: sandShots,
 			});
@@ -125,6 +132,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 			await updateStat({
 				roundId,
 				holeNumber,
+				holeId,
 				name: 'note',
 				value: note,
 			});
@@ -221,6 +229,7 @@ export default function RoundDetailPage() {
 							<div className="text-xs">Par {hole.par}</div>
 							<div className="text-xs">{teeForHole?.yardage} yds</div>
 						</div>
+						<input type="hidden" name="holeId" value={teeForHole?.id} />
 						<StatInput
 							name="score"
 							label="Score"
