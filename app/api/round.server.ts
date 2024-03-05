@@ -91,9 +91,13 @@ export async function createRound({
 			teeId,
 			totalScore: course.par,
 			holeStats: {
-				create: course.holes.map(h => ({
-					holeNumber: h.number,
-					score: h.par,
+				create: course.holes.map(({ id, number, par }) => ({
+					holeId: id,
+					holeNumber: number,
+					score: par,
+					drive: 'hit',
+					approach: 'hit',
+					putts: 2,
 				})),
 			},
 		},
