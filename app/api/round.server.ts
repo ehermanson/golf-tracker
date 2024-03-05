@@ -95,7 +95,7 @@ export async function createRound({
 					holeId: id,
 					holeNumber: number,
 					score: par,
-					drive: 'hit',
+					drive: par !== 3 ? 'hit' : null,
 					approach: 'hit',
 					putts: 2,
 				})),
