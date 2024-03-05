@@ -9,15 +9,14 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  email       String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id          String     @id @default(uuid())
+  email       String     @unique
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   displayName String?
   password    Password?
   rounds      Round[]
-
-  handicap Handicap[]
+  handicap    Handicap[]
 }
 
 model Password {
@@ -57,6 +56,7 @@ model Hole {
   course      Course?      @relation(fields: [courseId], references: [id])
   courseId    String?
   teeForHole  TeeForHole[]
+  HoleStats   HoleStats[]
 
   @@unique([number, courseId])
 }
@@ -120,8 +120,11 @@ model HoleStats {
   chipShots  Int?
   sandShots  Int?
   note       String?
-  roundId    String
-  round      Round   @relation(fields: [roundId], references: [id], onDelete: Cascade)
+
+  round   Round   @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId String
+  hole    Hole?   @relation(fields: [holeId], references: [id])
+  holeId  String?
 
   @@unique([roundId, holeNumber])
 }

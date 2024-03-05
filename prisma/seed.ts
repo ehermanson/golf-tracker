@@ -1,6 +1,10 @@
+import { faker } from '@faker-js/faker';
 import bcrypt from 'bcryptjs';
 
 import { PrismaClient } from '@prisma/client';
+
+import { pebble } from './mock_data/course-mocks';
+import { createStat } from './mock_data/hole-stats-mocks';
 
 const prisma = new PrismaClient();
 
@@ -30,107 +34,7 @@ async function seed() {
 
 	console.time('⛳️ Created course...');
 	const seedCourse = await prisma.course.create({
-		data: {
-			name: 'Pebble Beach Golf Links',
-			address: '1700 17 Mile Drive',
-			city: 'Pebble Beach',
-			state: 'CA',
-			country: 'United States',
-			holes: {
-				create: [
-					{
-						number: 1,
-						strokeIndex: 6,
-						par: 4,
-					},
-					{
-						number: 2,
-						strokeIndex: 10,
-						par: 5,
-					},
-					{
-						number: 3,
-						strokeIndex: 12,
-						par: 4,
-					},
-					{
-						number: 4,
-						strokeIndex: 16,
-						par: 4,
-					},
-					{
-						number: 5,
-						strokeIndex: 14,
-						par: 3,
-					},
-					{
-						number: 6,
-						strokeIndex: 2,
-						par: 5,
-					},
-					{
-						number: 7,
-						strokeIndex: 18,
-						par: 3,
-					},
-					{
-						number: 8,
-						strokeIndex: 4,
-						par: 4,
-					},
-					{
-						number: 9,
-						strokeIndex: 8,
-						par: 4,
-					},
-					{
-						number: 10,
-						strokeIndex: 3,
-						par: 4,
-					},
-					{
-						number: 11,
-						strokeIndex: 9,
-						par: 4,
-					},
-					{
-						number: 12,
-						strokeIndex: 17,
-						par: 3,
-					},
-					{
-						number: 13,
-						strokeIndex: 7,
-						par: 4,
-					},
-					{
-						number: 14,
-						strokeIndex: 1,
-						par: 5,
-					},
-					{
-						number: 15,
-						strokeIndex: 13,
-						par: 4,
-					},
-					{
-						number: 16,
-						strokeIndex: 11,
-						par: 4,
-					},
-					{
-						number: 17,
-						strokeIndex: 15,
-						par: 3,
-					},
-					{
-						number: 18,
-						strokeIndex: 5,
-						par: 5,
-					},
-				],
-			},
-		},
+		data: pebble,
 		include: {
 			holes: true,
 		},
@@ -163,169 +67,56 @@ async function seed() {
 
 	console.timeEnd('⛳️ Created course...');
 
-	console.time('🏌️ Created round...');
+	console.time('🏌️ Created rounds...');
 
-	const holeData = [
-		{
-			holeNumber: 1,
-			score: 4,
-			drive: 'hit',
-			approach: 'hit',
-			putts: 2,
-		},
-		{
-			holeNumber: 2,
-			score: 5,
-			drive: 'hit',
-			approach: 'left',
-			putts: 1,
-			sandShots: 1,
-		},
-		{
-			holeNumber: 3,
-			score: 5,
-			drive: 'right',
-			approach: 'right',
-			putts: 2,
-		},
-		{
-			holeNumber: 4,
-			score: 4,
-			drive: 'right',
-			approach: 'hit',
-			putts: 2,
-		},
-		{
-			holeNumber: 5,
-			score: 2,
-			drive: null,
-			approach: 'hit',
-			putts: 1,
-		},
-		{
-			holeNumber: 6,
-			score: 6,
-			drive: 'hit',
-			approach: 'right',
-			putts: 2,
-		},
-		{
-			holeNumber: 7,
-			score: 2,
-			drive: null,
-			approach: 'hit',
-			putts: 1,
-		},
-		{
-			holeNumber: 8,
-			score: 3,
-			drive: 'hit',
-			approach: 'hit',
-			putts: 1,
-		},
-		{
-			holeNumber: 9,
-			score: 6,
-			drive: 'right',
-			approach: 'right',
-			putts: 2,
-		},
-		{
-			holeNumber: 10,
-			score: 4,
-			drive: 'left',
-			approach: 'short',
-			putts: 1,
-			chipShots: 1,
-		},
-		{
-			holeNumber: 11,
-			score: 8,
-			drive: 'left',
-			approach: 'left',
-			putts: 3,
-			chipShots: 1,
-			note: 'I suck.',
-		},
-		{
-			holeNumber: 12,
-			score: 3,
-			drive: null,
-			approach: 'hit',
-			putts: 2,
-		},
-		{
-			holeNumber: 13,
-			score: 4,
-			drive: 'hit',
-			approach: 'hit',
-			putts: 2,
-		},
-		{
-			holeNumber: 14,
-			score: 3,
-			drive: 'hit',
-			approach: 'hit',
-			putts: 1,
-			note: 'cool',
-		},
-		{
-			holeNumber: 15,
-			score: 4,
-			drive: 'hit',
-			approach: 'hit',
-			putts: 2,
-		},
-		{
-			holeNumber: 16,
-			score: 5,
-			drive: 'left',
-			approach: 'left',
-			putts: 1,
-			chipShots: 1,
-		},
-		{
-			holeNumber: 17,
-			score: 4,
-			drive: null,
-			approach: 'hit',
-			putts: 3,
-		},
-		{
-			holeNumber: 18,
-			score: 5,
-			drive: 'hit',
-			approach: 'hit',
-			putts: 2,
-		},
-	];
+	async function createRound(date: Date) {
+		const statPromises = Array.from({ length: 18 }).map(async (_, idx) => {
+			const holeNumber = idx + 1;
+			const hole = seedCourse.holes.find(hole => hole.number === holeNumber);
 
-	const date = new Date();
-	const seedRound = await prisma.round.create({
-		data: {
-			datePlayed: date.toISOString(),
-			numberOfHoles: 18,
-			courseId: seedCourse.id,
-			userId: seedUser.id,
-			teeId: seedTee.id,
-			totalScore: holeData.reduce((tot, curr) => tot + curr.score, 0),
-			totalPutts: holeData.reduce((tot, curr) => tot + curr.putts, 0),
-			totalFairways: holeData.filter(d => d.drive === 'hit').length,
-			totalGir: holeData.filter(d => d.approach === 'hit').length,
-		},
-	});
+			if (!hole) {
+				throw new Error('could not find matching hole');
+			}
 
-	holeData.forEach(async hole => {
-		await prisma.holeStats.create({
+			return createStat(holeNumber, hole.id);
+		});
+
+		const stats = await Promise.all(statPromises);
+
+		return await prisma.round.create({
 			data: {
-				roundId: seedRound.id,
-				...hole,
+				datePlayed: date.toISOString(),
+				numberOfHoles: 18,
+				courseId: seedCourse.id,
+				userId: seedUser.id,
+				teeId: seedTee.id,
+				totalScore: stats.reduce((tot, curr) => tot + curr.score, 0),
+				totalPutts: stats.reduce((tot, curr) => tot + curr.putts, 0),
+				totalFairways: stats.filter(d => d.drive === 'hit').length,
+				totalGir: stats.filter(d => d.approach === 'hit').length,
+				holeStats: {
+					create: stats,
+				},
 			},
 		});
+	}
+
+	const date = new Date();
+	const month = date.getMonth();
+	const year = date.getFullYear();
+
+	Array.from({
+		length: faker.number.int({ min: 20, max: 30 }),
+	}).map(() => {
+		return createRound(
+			faker.date.between({
+				from: new Date(year, month - 1, 1),
+				to: new Date(year, month + 1, -1),
+			}),
+		);
 	});
 
-	console.timeEnd('🏌️ Created round...');
-
+	console.timeEnd('🏌️ Created rounds...');
 	console.timeEnd(`🌱 Database has been seeded`);
 }
 
