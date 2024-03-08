@@ -152,8 +152,6 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 export default function RoundDetailPage() {
 	const { round } = useLoaderData<typeof loader>();
 
-	console.log({ round });
-
 	const toPar = round.totalScore
 		? formatScoreToPar({
 				par: round.course.par,

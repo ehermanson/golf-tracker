@@ -1,3 +1,4 @@
+import { ClientOnly } from 'remix-utils/client-only';
 import invariant from 'tiny-invariant';
 
 import { type Prisma } from '@prisma/client';
@@ -244,18 +245,22 @@ export default function RoundDetailPage() {
 					</CardHeader>
 					<CardContent>
 						<div className="h-96 mb-8 font-bold">
-							<PieChart
-								data={scoreDistributionChart}
-								arcLabel={e =>
-									`${e.id} - ${((e.value / 18) * 100).toFixed(1)}%`
-								}
-								layers={[
-									'arcs',
-									'arcLabels',
-									// @ts-ignore
-									CenteredMetric,
-								]}
-							/>
+							<ClientOnly>
+								{() => (
+									<PieChart
+										data={scoreDistributionChart}
+										arcLabel={e =>
+											`${e.id} - ${((e.value / 18) * 100).toFixed(1)}%`
+										}
+										layers={[
+											'arcs',
+											'arcLabels',
+											// @ts-ignore
+											CenteredMetric,
+										]}
+									/>
+								)}
+							</ClientOnly>
 						</div>
 						<CardTitle className="text-sm font-bold mb-2">
 							Scoring Averages
@@ -284,12 +289,16 @@ export default function RoundDetailPage() {
 						}
 						subStat={
 							<div className="h-40">
-								<PieChart
-									data={driveChartData}
-									startAngle={-90}
-									endAngle={90}
-									arcLabel={e => `${e.label}`}
-								/>
+								<ClientOnly>
+									{() => (
+										<PieChart
+											data={driveChartData}
+											startAngle={-90}
+											endAngle={90}
+											arcLabel={e => `${e.label}`}
+										/>
+									)}
+								</ClientOnly>
 							</div>
 						}
 					/>
@@ -307,12 +316,16 @@ export default function RoundDetailPage() {
 						}
 						subStat={
 							<div className="h-40">
-								<PieChart
-									data={approachChartData}
-									startAngle={-90}
-									endAngle={90}
-									arcLabel={e => `${e.label}`}
-								/>
+								<ClientOnly>
+									{() => (
+										<PieChart
+											data={approachChartData}
+											startAngle={-90}
+											endAngle={90}
+											arcLabel={e => `${e.label}`}
+										/>
+									)}
+								</ClientOnly>
 							</div>
 						}
 					/>

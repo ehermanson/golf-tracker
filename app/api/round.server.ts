@@ -38,7 +38,11 @@ export async function getRoundWithStats({ id }: { id: Round['id'] }) {
 					teeForHole: true,
 				},
 			},
-			holeStats: true,
+			holeStats: {
+				include: {
+					hole: true,
+				},
+			},
 		},
 	});
 

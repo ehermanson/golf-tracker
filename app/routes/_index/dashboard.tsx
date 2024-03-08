@@ -305,8 +305,6 @@ const CenteredMetric = ({
 	centerX: number;
 	centerY: number;
 }) => {
-	console.log({ dataWithArc, props });
-
 	const totalScores = Object.values(dataWithArc).reduce(
 		(tot, cur) => tot + cur.value,
 		0,
